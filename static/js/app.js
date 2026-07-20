@@ -93,6 +93,14 @@ async function init() {
         dom.initialState.innerHTML =
             '<div class="empty-state"><span class="icon">⚠️</span><p>Error cargando las paradas. Recargá la página.</p></div>';
     }
+
+    registerSW();
+}
+
+function registerSW() {
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/static/sw.js");
+    }
 }
 
 // --- Tabs ---
