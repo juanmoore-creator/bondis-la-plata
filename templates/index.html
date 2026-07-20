@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Consulta los horarios de llegada de colectivos en La Plata, Berisso y Ensenada.">
+    <title>BONDIS — ¿Cuándo llega?</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="app">
+
+        <!-- Header -->
+        <header class="header">
+            <div class="header-brand">
+                <span class="icon">🚌</span>
+                <h1>BONDIS</h1>
+            </div>
+            <div id="clock" class="clock">--:--:--</div>
+        </header>
+
+        <!-- Global Search Bar (always visible) -->
+        <div id="global-search" class="global-search">
+            <div class="global-search-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="search" id="global-search-input" class="global-search-input"
+                       placeholder="Buscar parada, calle o zona..."
+                       autocomplete="off">
+                <button id="global-search-clear" class="global-search-clear" aria-label="Limpiar">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div id="global-search-results" class="search-dropdown"></div>
+        </div>
+
+        <!-- ====== TAB: HOME ====== -->
+        <div id="tab-home" class="tab-page active">
+            <div class="home-content">
+                <div id="home-recents" class="home-section">
+                    <div class="home-section-title">Recientes</div>
+                    <div id="home-recents-list"></div>
+                </div>
+                <div id="home-favorites" class="home-section">
+                    <div class="home-section-title">Mis Paradas</div>
+                    <!-- JS renders favorite cards here -->
+                </div>
+                <div id="home-empty" class="empty-state">
+                    <span class="icon">⭐</span>
+                    <p>Todavía no tenés favoritos.</p>
+                    <p class="empty-hint">Explorá las líneas y marcá las paradas que más usás.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== TAB: EXPLORE ====== -->
+        <div id="tab-explore" class="tab-page">
+
+            <!-- Line Selector -->
+            <div class="lines-section">
+                <div id="lines-scroll" class="lines-scroll">
+                    <!-- JS renders pills here -->
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div id="search-section" class="search-section">
+                <div class="search-wrapper">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" id="search-input" class="search-input"
+                           placeholder="Buscar calle, intersección o zona...">
+                    <button id="search-clear" class="search-clear" aria-label="Limpiar búsqueda">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div class="search-meta">
+                    <span id="search-count">--</span>
+                </div>
+            </div>
+
+            <!-- Explore Content -->
+            <div class="content">
+                <div id="initial-state" class="empty-state">
+                    <span class="icon">🚌</span>
+                    <p>Seleccioná una línea para ver las paradas.</p>
+                </div>
+                <ul id="stop-list" class="stop-list" style="display: none;">
+                    <!-- JS renders stops here -->
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- ====== ARRIVALS OVERLAY (shared) ====== -->
+        <div id="arrivals-overlay" class="arrivals-overlay">
+            <div class="arrivals-header">
+                <button id="btn-back" class="btn-back" aria-label="Volver">
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+                <div class="arrivals-info">
+                    <div id="arr-stop-name" class="arrivals-stop-name">--</div>
+                    <div id="arr-zone" class="arrivals-zone">--</div>
+                </div>
+                <button id="btn-fav-arrivals" class="btn-fav" aria-label="Favorito">
+                    <i class="bi bi-star"></i>
+                </button>
+                <button id="btn-refresh" class="btn-refresh" aria-label="Actualizar">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </div>
+            <div class="refresh-bar">
+                <div id="refresh-bar-fill" class="refresh-bar-fill"></div>
+            </div>
+            <div id="arrivals-body" class="arrivals-body">
+                <!-- JS renders arrivals here -->
+            </div>
+            <div id="arrivals-footer" class="arrivals-footer">--</div>
+        </div>
+
+        <!-- ====== BOTTOM TAB BAR ====== -->
+        <nav class="tab-bar">
+            <button class="tab-btn active" data-tab="home">
+                <i class="bi bi-house-door-fill"></i>
+                <span>Inicio</span>
+            </button>
+            <button class="tab-btn" data-tab="explore">
+                <i class="bi bi-search"></i>
+                <span>Explorar</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <script src="/static/js/favorites.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
