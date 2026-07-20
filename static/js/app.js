@@ -838,5 +838,93 @@ function startClock() {
     setInterval(tick, 1000);
 }
 
+// --- Install Prompt ---
+const INSTALL_DISMISSED_KEY = "bondis_install_dismissed";
+let deferredPrompt = null;
+
+function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+function isInstalled() {
+    return window.matchMedia("(display-mode: standalone)").matches;
+}
+
+function shouldShowInstallBanner() {
+    if (isInstalled()) return false;
+    if (localStorage.getItem(INSTALL_DISMISSED_KEY)) return false;
+    return true;
+}
+
+function createInstallBanner() {
+    if (!shouldShowInstallBanner()) return;
+
+    const banner = document.createElement("div");
+    banner.className = "install-banner";
+    banner.id = "install-banner";
+
+    if (isIOS()) {
+        banner.innerHTML = `
+            <div class="install-banner-content">
+                <div class="install-banner-icon"><i class="bi bi-box-arrow-up"></i></div>
+                <div class="install-banner-text">
+                    <strong>Instalá BONDIS</strong>
+                    <span>Tocá <i class="bi bi-share"></i> Compartir → Agregar a Inicio</span>
+                </div>
+                <button class="install-banner-close" aria-label="Cerrar">&times;</button>
+            </div>
+        `;
+    } else {
+        banner.innerHTML = `
+            <div class="install-banner-content">
+                <div class="install-banner-icon"><i class="bi bi-download"></i></div>
+                <div class="install-banner-text">
+                    <strong>Instalá BONDIS</strong>
+                    <span>Sin conexión. Más rápido. Como una app.</span>
+                </div>
+                <button class="install-banner-btn">Instalar</button>
+                <button class="install-banner-close" aria-label="Cerrar">&times;</button>
+            </div>
+        `;
+
+        const installBtn = banner.querySelector(".install-banner-btn");
+        installBtn.addEventListener("click", async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const result = await deferredPrompt.userChoice;
+                if (result.outcome === "accepted") banner.remove();
+                deferredPrompt = null;
+            }
+        });
+    }
+
+    banner.querySelector(".install-banner-close").addEventListener("click", () => {
+        banner.remove();
+        localStorage.setItem(INSTALL_DISMISSED_KEY, "1");
+    });
+
+    document.body.appendChild(banner);
+}
+
+// Listen for beforeinstallprompt (Android Chrome)
+window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    createInstallBanner();
+});
+
+// For iOS: show banner on load if not installed
+if (isIOS() && shouldShowInstallBanner()) {
+    // Small delay to let the app render first
+    setTimeout(createInstallBanner, 3000);
+}
+
+// Also try for Android if beforeinstallprompt didn't fire after a while
+setTimeout(() => {
+    if (!deferredPrompt && !isIOS() && shouldShowInstallBanner()) {
+        createInstallBanner();
+    }
+}, 5000);
+
 // --- Bootstrap ---
 init();
