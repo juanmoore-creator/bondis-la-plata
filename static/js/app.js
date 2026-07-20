@@ -192,6 +192,10 @@ function closeGlobalSearch() {
     globalSelectedIdx = -1;
 }
 
+function getTokens(text) {
+    return text.split(/\s+/).filter(Boolean);
+}
+
 function renderGlobalResults(query) {
     const q = normalize(query);
     if (!q) {
@@ -200,9 +204,12 @@ function renderGlobalResults(query) {
         return;
     }
 
-    const results = searchIndex.filter(
-        (s) => normalize(s.n).includes(q) || normalize(s.z).includes(q)
-    );
+    const qTokens = getTokens(q);
+
+    const results = searchIndex.filter((s) => {
+        const text = normalize(s.n) + " " + normalize(s.z);
+        return qTokens.every((token) => text.includes(token));
+    });
 
     if (results.length === 0) {
         dom.globalSearchResults.innerHTML =
@@ -218,7 +225,7 @@ function renderGlobalResults(query) {
 
     let html = "";
     top.forEach((s) => {
-        const nameHighlighted = highlightMatch(s.n, q);
+        const nameHighlighted = highlightTokens(s.n, qTokens);
         const lineasHtml = s.l.slice(0, 3).map((cod) => {
             const l = lineasMap[cod];
             return l
@@ -263,13 +270,14 @@ function renderGlobalResults(query) {
     });
 }
 
-function highlightMatch(text, query) {
-    const idx = normalize(text).indexOf(query);
-    if (idx === -1) return escapeHtml(text);
-    const before = escapeHtml(text.slice(0, idx));
-    const match = escapeHtml(text.slice(idx, idx + query.length));
-    const after = escapeHtml(text.slice(idx + query.length));
-    return `${before}<mark>${match}</mark>${after}`;
+function highlightTokens(text, tokens) {
+    let result = escapeHtml(text);
+    for (const token of tokens) {
+        const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const pattern = new RegExp(`(${escaped})`, "gi");
+        result = result.replace(pattern, "<mark>$1</mark>");
+    }
+    return result;
 }
 
 function escapeHtml(text) {
@@ -466,11 +474,11 @@ function renderStops() {
 
     let filtered = currentStops;
     if (searchQuery) {
-        filtered = currentStops.filter(
-            (s) =>
-                normalize(s.nombre).includes(searchQuery) ||
-                normalize(s.zona).includes(searchQuery)
-        );
+        const qTokens = getTokens(searchQuery);
+        filtered = currentStops.filter((s) => {
+            const text = normalize(s.nombre) + " " + normalize(s.zona);
+            return qTokens.every((token) => text.includes(token));
+        });
     }
 
     if (searchQuery) {
